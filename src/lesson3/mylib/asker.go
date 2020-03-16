@@ -15,7 +15,7 @@ func AskInt(message string) int {
     scanner.Scan()
     s := scanner.Text()
     n, err := strconv.Atoi(s)
-    
+
     if err == nil {
       return n
     }
@@ -30,20 +30,29 @@ func contains(s string, set []string) bool{
     }
   }
 }
+
+func AskRange(message string, low int, high int) int {
+  for {
+    i := AskInt(message)
+  
+    if i >= low && i <= high {
+      return i
+    }
+
+    fmt.Printf("Number not in range %d - %d\n", low, high)
+  }
+}
+
 // ["Higher", "Lower", "Yes"]
 func AskSet(message string, set []string) string {
   scanner := bufio.NewScanner(os.Stdin)
   for {
     fmt.Printf("%s\n>>", message)
     s := scanner.Text()
-    
+
     if contains(s, set) {
       return s
     }
-    
-    fmt.Printf("Error: '%s' is not an acceptable answer")
-}
 
-func AskRange(message string, low int, high int) int {
-  
+    fmt.Printf("Error: '%s' is not an acceptable answer")
 }

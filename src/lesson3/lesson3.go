@@ -82,11 +82,9 @@ func seeker() {
     }
   }
   
-  fp
-  
 }
 
 func main() {
-  seeker()
+  //seeker()
   keeper()
 }
