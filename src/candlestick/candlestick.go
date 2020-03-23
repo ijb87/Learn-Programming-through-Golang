@@ -6,6 +6,7 @@ import (
   "time"
   "mylib/asker"
   "strconv"
+  "net/http"
 )
 
 type Player struct {
@@ -183,11 +184,15 @@ func round(pl []*Player, first int) int {
   return winP
 }
 
-func main() {
-  rand.Seed(time.Now().Unix())
-  players := make([]*Player, 4)
+func playGame(nplayers int) int {
+  if nplayers <= 0 {
+    return -1
+  }
 
-  for i := 0; i < 4; i++ {
+  rand.Seed(time.Now().Unix())
+  players := make([]*Player, nplayers)
+
+  for i := 0; i < nplayers; i++ {
     players[i] = NewPlayer(i == 0)
     // fmt.Printf("%s, \n%s\n, %d\n\n", players[i].deck, players[i].hand, players[i].score)
   }
@@ -195,10 +200,49 @@ func main() {
   w := -1
   for i := 0; i < 13; i ++ {
     if w == -1 {
-      w = rand.Intn(4)
+      w = rand.Intn(nplayers)
     }
     w = round(players, w)
   }
 
-  // Get winner
+  // Get winner.
+  ws := -1
+  wp := -1
+
+  for k, p := range players {
+    if p.score > ws {
+      count := 0
+      for i := 0; i < len(players); i++ {
+        if p.score == players[i].score {
+          count++
+        }
+      }
+      if count == 1 {
+        ws = p.score
+        wp = k
+      }
+    }
+}
+
+if wp == -1 {
+  fmt.Printf("Draw\n")
+  return -1
+}
+
+fmt.Printf("Player %d wins\n\n", wp)
+return wp
+}
+
+func handle (w http.ResponseWriter, r *http.Request)  {
+  fmt.Fprintf(w, "<a href=\"/go\">Hello</a>, you pathed to :%s", r.URL.Path)
+}
+
+func main()  {
+  http.HandleFunc("/", handle)
+
+  fmt.Printf("Server Starting\n")
+  err := http.ListenAndServe(":8080", nil)
+  if err != nil {
+    fmt.Println(err)
+  }
 }
