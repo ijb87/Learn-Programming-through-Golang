@@ -7,13 +7,31 @@ import (
   "mylib/asker"
   "strconv"
   "net/http"
+  "text/template"
+  "strings"
 )
 
 type Player struct {
-  deck []int
-  hand []int
-  score int
-  isHuman bool
+  Deck []int
+  Hand []int
+  Score int
+  IsHuman bool
+}
+
+type Game struct {
+  Players []*Player
+  LastWon int
+  Message string
+}
+
+func NewGame(nPlayers int) {
+  players := make([]*Player, nplayers)
+
+  for i := 0; i < nplayers; i++ {
+    players[i] = NewPlayer(i == 0)
+    // fmt.Printf("%s, \n%s\n, %d\n\n", players[i].deck, players[i].hand, players[i].score)
+  }
+  return &Game{players, -1, ""}
 }
 
 func NewPlayer(isH bool) *Player {
@@ -189,7 +207,7 @@ func playGame(nplayers int) int {
     return -1
   }
 
-  rand.Seed(time.Now().Unix())
+
   players := make([]*Player, nplayers)
 
   for i := 0; i < nplayers; i++ {
@@ -233,15 +251,46 @@ fmt.Printf("Player %d wins\n\n", wp)
 return wp
 }
 
+// Webby Section
+//
+
+var temps *template.Template := template.ParseGlob("main.html")
+var game *Game
+
+
 func handle (w http.ResponseWriter, r *http.Request)  {
-  fmt.Fprintf(w, "<a href=\"/go\">Hello</a>, you pathed to :%s", r.URL.Path)
+
+  path := strings.RemovePrefix("/", r.URL.Path)
+  _, err := strconv.Atoi(path)
+  if err != nil {
+    // Play round of game
+  } else {
+    game.Message = fmt.Sprintf("Error: %d", err)
+  }
+  err := temps.Execute(w, game)
+  if err != nil {
+    fmt.Println(err)
+    fmt.Fprintln(w, err)
+  }
 }
 
 func main()  {
+  rand.Seed(time.Now().Unix())
+
+  var err error
+
+  temps, err = template.ParseGlob("templates/*.html")
+  if err != nil {
+    fmt.Println(err)
+    return
+  }
+
+  game = NewGame(5)
+
   http.HandleFunc("/", handle)
 
   fmt.Printf("Server Starting\n")
-  err := http.ListenAndServe(":8080", nil)
+  err := http.ListenAndServe(":8081", nil)
   if err != nil {
     fmt.Println(err)
   }

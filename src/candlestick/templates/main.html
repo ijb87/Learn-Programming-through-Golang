@@ -1,0 +1,16 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <body>
+      <h1>Unique CandleStick</h1>
+      <p>
+        Please Choose a Card
+        </p>
+      {{$a := index .Players 0}}
+      {{range $a.Hand}}
+        <a href="{{ . }}">{{ . }}</a><br />
+      {{end}}
+      </body>
+    </head>
+</html>
