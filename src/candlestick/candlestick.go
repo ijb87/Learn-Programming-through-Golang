@@ -12,6 +12,24 @@ type Player struct {
   score int
 }
 
+func NewPlayer() *Player {
+  res := &Player{
+    makeDeck(),
+    make([]int, 0),
+    0,
+  }
+
+  res.DrawCards(3)
+  return res
+}
+
+
+
+func (self *Player) DrawCards(n int) {
+  self.hand = append(self.hand, self.deck[:n]...)
+  self.deck = self.deck[n:]
+}
+
 // contains returns the number of elements in the slice that match the comparator (c)
 func contains(ar []int, c int)int {
   res := 0
@@ -40,8 +58,9 @@ func beats(c1, c2 int, aceHigh, reverse bool) bool {
 }
 
 //DecideTrick takes a list of cards, one for each player and decides who won according to CandleStick rules
-// return -1 for a draw
-func DecideTrick(ar []int)int {
+// returns winningPlayer, winningCard
+// returns -1, -1 for a draw
+func DecideTrick(ar []int) (int, int) {
   uniques := make([]int, 0)
 
   for i := 0; i < len(ar); i++ {
@@ -52,7 +71,7 @@ func DecideTrick(ar []int)int {
   }
 
 if len(uniques) == 0 {
-  return -1
+  return -1, -1
 }
 
   aceHigh := contains(uniques, 13) > 0
@@ -72,7 +91,13 @@ if len(uniques) == 0 {
       winningCard = uniques[i]
     }
   }
-  return winningCard
+  winningPlayer := -1
+  for k, v := range ar {
+    if v == winningCard {
+      winningPlayer = k
+    }
+  }
+  return winningPlayer, winningCard
 }
 
 func makeDeck()[]int{
@@ -95,12 +120,12 @@ func main() {
 
   rand.Seed(time.Now().Unix())
 
-  allDecks := make([][]int, 4)
+  players := make([]*Player, 4)
 
   for i := 0; i < 4; i++ {
-    allDecks[i] = makeDeck()
+    players[i] = NewPlayer()
+    fmt.Printf("%s, \n%s\n, %d\n\n", players[i].deck, players[i].hand, players[i].score)
   }
 
-
-  fmt.Println(allDecks)
+  fmt.Println(players)
 }
