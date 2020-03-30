@@ -1,7 +1,7 @@
 {{define "round"}}
     {{range $k ,$v := .Played}}
         {{if ne $v 0 }}
-        P{{$k}} <b>{{$v}}</b> , 
+        P{{$k}} <b>{{$v}}</b> ,
         {{end}}
     {{end}}
     {{if ne .Winner -1}}
@@ -22,9 +22,9 @@
     {{end}}
     <h2>This round</h2>
     {{template "round" (index .Rounds (add (len .Rounds) -1))}}
-   
+
     <p>Please Choose a Card</p>
-    {{$a := index .Players 0}}
+    {{$a := index.Players 0}}
     {{range $a.Hand }}
         <a href="{{.}}">{{.}}</a><br>
     {{end}}
